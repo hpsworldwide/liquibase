@@ -1,6 +1,7 @@
 package liquibase.snapshot;
 
 import liquibase.database.Database;
+import liquibase.diff.output.ObjectChangeFilter;
 import liquibase.exception.DatabaseException;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.core.Column;
@@ -21,7 +22,7 @@ public class MockSnapshotGeneratorFactory extends SnapshotGeneratorFactory{
     }
 
     @Override
-    public DatabaseSnapshot createSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
+    public DatabaseSnapshot createSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter) throws DatabaseException, InvalidExampleException {
         return new MockDatabaseSnapshot(objects, examples, database, snapshotControl);
     }
 

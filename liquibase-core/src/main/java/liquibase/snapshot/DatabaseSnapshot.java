@@ -9,6 +9,7 @@ import liquibase.database.DatabaseConnection;
 import liquibase.database.OfflineConnection;
 import liquibase.diff.compare.CompareControl;
 import liquibase.diff.compare.DatabaseObjectComparatorFactory;
+import liquibase.diff.output.ObjectChangeFilter;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.logging.Logger;
@@ -41,6 +42,12 @@ public abstract class DatabaseSnapshot implements LiquibaseSerializable {
     private DatabaseObjectCollection referencedObjects;
     private Map<Class<? extends DatabaseObject>, Set<DatabaseObject>> knownNull = new HashMap<>();
 
+    protected ObjectChangeFilter getObjectChangeFilter() {
+        return objectChangeFilter;
+    }
+
+    private final ObjectChangeFilter objectChangeFilter;
+
     private Map<String, Object> snapshotScratchPad = new HashMap<>();
 
     private Map<String, ResultSetCache> resultSetCaches = new HashMap<>();
@@ -48,12 +55,12 @@ public abstract class DatabaseSnapshot implements LiquibaseSerializable {
 
     private Map<String, Object> metadata = new HashMap<>();
 
-    DatabaseSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
+    DatabaseSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter) throws DatabaseException, InvalidExampleException {
         this.database = database;
         allFound = new DatabaseObjectCollection(database);
         referencedObjects = new DatabaseObjectCollection(database);
         this.snapshotControl = snapshotControl;
-
+        this.objectChangeFilter = objectChangeFilter;
         this.originalExamples = ((examples == null) ? new DatabaseObject[0] : examples);
 
         init(examples);
@@ -68,7 +75,7 @@ public abstract class DatabaseSnapshot implements LiquibaseSerializable {
     }
 
     public DatabaseSnapshot(DatabaseObject[] examples, Database database) throws DatabaseException, InvalidExampleException {
-        this(examples, database, new SnapshotControl(database));
+        this(examples, database, new SnapshotControl(database), null);
     }
 
     protected void init(DatabaseObject[] examples) throws DatabaseException, InvalidExampleException {

@@ -110,7 +110,7 @@ public class SnapshotCommand extends AbstractCommand<SnapshotCommand.SnapshotCom
         database.setObjectQuotingStrategy(ObjectQuotingStrategy.QUOTE_ALL_OBJECTS);
         DatabaseSnapshot snapshot;
         try {
-            snapshot = SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, database, snapshotControl);
+            snapshot = SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, database, snapshotControl, null);
         } finally {
             database.setObjectQuotingStrategy(originalQuotingStrategy);
         }

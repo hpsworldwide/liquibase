@@ -7,6 +7,7 @@ import liquibase.database.DatabaseConnection;
 import liquibase.database.OfflineConnection;
 import liquibase.database.core.PostgresDatabase;
 import liquibase.diff.compare.DatabaseObjectComparatorFactory;
+import liquibase.diff.output.ObjectChangeFilter;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.executor.ExecutorService;
@@ -130,7 +131,7 @@ public class SnapshotGeneratorFactory {
         SnapshotControl snapshotControl = (new SnapshotControl(database, false, types.toArray(new Class[types.size()])));
         snapshotControl.setWarnIfObjectNotFound(false);
 
-        if (createSnapshot(example, database,snapshotControl) != null) {
+        if (createSnapshot(example, database) != null) {
             return true;
         }
         CatalogAndSchema catalogAndSchema;
@@ -152,7 +153,7 @@ public class SnapshotGeneratorFactory {
     }
 
     public DatabaseSnapshot createSnapshot(CatalogAndSchema example, Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
-        return createSnapshot(new CatalogAndSchema[] {example}, database, snapshotControl);
+        return createSnapshot(new CatalogAndSchema[] {example}, database, snapshotControl,null);
     }
 
     /**
@@ -166,7 +167,7 @@ public class SnapshotGeneratorFactory {
      * @throws InvalidExampleException if the given catalog/schema combinations are invalid (e.g. duplicates)
      */
     public DatabaseSnapshot createSnapshot(CatalogAndSchema[] examples, Database database,
-                                           SnapshotControl snapshotControl)
+                                           SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter)
             throws DatabaseException, InvalidExampleException {
         if (database == null) {
             return null;
@@ -185,7 +186,7 @@ public class SnapshotGeneratorFactory {
 
         }
 
-        return createSnapshot(schemas, database, snapshotControl);
+        return createSnapshot(schemas, database, snapshotControl, objectChangeFilter);
     }
 
     /**
@@ -199,7 +200,7 @@ public class SnapshotGeneratorFactory {
      * @throws InvalidExampleException if the given catalog/schema combinations are invalid (e.g. duplicates)
      */
     public DatabaseSnapshot createSnapshot(DatabaseObject[] examples, Database database,
-                                           SnapshotControl snapshotControl)
+                                           SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter)
             throws DatabaseException, InvalidExampleException {
         DatabaseConnection conn = database.getConnection();
         if (conn == null) {
@@ -212,7 +213,7 @@ public class SnapshotGeneratorFactory {
             }
             return snapshot;
         }
-        return new JdbcDatabaseSnapshot(examples, database, snapshotControl);
+        return new JdbcDatabaseSnapshot(examples, database, snapshotControl, objectChangeFilter);
     }
 
     /**
@@ -225,7 +226,7 @@ public class SnapshotGeneratorFactory {
      * @throws InvalidExampleException if the given catalog/schema combinations are invalid (e.g. duplicates)
      */
     public <T extends DatabaseObject> T createSnapshot(T example, Database database) throws DatabaseException, InvalidExampleException {
-        return createSnapshot(example, database, new SnapshotControl(database));
+        return createSnapshot(example, database, new SnapshotControl(database), null);
     }
 
     /**
@@ -239,17 +240,17 @@ public class SnapshotGeneratorFactory {
      * @throws DatabaseException if a problem occurs during snapshotting
      * @throws InvalidExampleException if the given catalog/schema combinations are invalid (e.g. duplicates)
      */
-    public <T extends DatabaseObject> T createSnapshot(T example, Database database, SnapshotControl snapshotControl)
+    public <T extends DatabaseObject> T createSnapshot(T example, Database database, SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter)
             throws DatabaseException, InvalidExampleException {
-        DatabaseSnapshot snapshot = createSnapshot(new DatabaseObject[]{example}, database, snapshotControl);
+        DatabaseSnapshot snapshot = createSnapshot(new DatabaseObject[]{example}, database, snapshotControl, objectChangeFilter);
         return snapshot.get(example);
     }
 
-    public Table getDatabaseChangeLogTable(SnapshotControl snapshotControl, Database database) throws DatabaseException {
+    public Table getDatabaseChangeLogTable(SnapshotControl snapshotControl, Database database, ObjectChangeFilter objectChangeFilter) throws DatabaseException {
         try {
             Table liquibaseTable = (Table) new Table().setName(database.getDatabaseChangeLogTableName()).setSchema(
                     new Schema(database.getLiquibaseCatalogName(), database.getLiquibaseSchemaName()));
-            return createSnapshot(liquibaseTable, database, snapshotControl);
+            return createSnapshot(liquibaseTable, database, snapshotControl, objectChangeFilter);
         } catch (InvalidExampleException e) {
             throw new UnexpectedLiquibaseException(e);
         }

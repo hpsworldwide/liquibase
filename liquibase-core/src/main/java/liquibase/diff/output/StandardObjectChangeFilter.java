@@ -26,6 +26,10 @@ public class StandardObjectChangeFilter implements ObjectChangeFilter {
 
     private FilterType filterType;
 
+    public List<Filter> getFilters() {
+        return filters;
+    }
+
     private List<Filter> filters = new ArrayList<>();
     private boolean catalogOrSchemaFilter;
 
@@ -117,9 +121,18 @@ public class StandardObjectChangeFilter implements ObjectChangeFilter {
      * The "name" of the object might be what is returned from getName(), or it might
      * be a different 'identifier' for different objet types.
      */
-    protected static class Filter {
+    public static class Filter {
+
+        public Class<DatabaseObject> getObjectType() {
+            return objectType;
+        }
 
         private Class<DatabaseObject> objectType;
+
+        public Pattern getNameMatcher() {
+            return nameMatcher;
+        }
+
         private Pattern nameMatcher;
 
         public Filter(Class<DatabaseObject> objectType, Pattern nameMatcher) {

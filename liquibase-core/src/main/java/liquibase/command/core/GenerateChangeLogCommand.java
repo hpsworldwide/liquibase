@@ -91,6 +91,6 @@ public class GenerateChangeLogCommand extends DiffToChangeLogCommand {
     @Override
     protected DatabaseSnapshot createTargetSnapshot() throws DatabaseException, InvalidExampleException {
         SnapshotControl snapshotControl = new SnapshotControl(getReferenceDatabase(), getSnapshotTypes());
-        return SnapshotGeneratorFactory.getInstance().createSnapshot(getCompareControl().getSchemas(CompareControl.DatabaseRole.REFERENCE), null, snapshotControl);
+        return SnapshotGeneratorFactory.getInstance().createSnapshot(getCompareControl().getSchemas(CompareControl.DatabaseRole.REFERENCE), null, snapshotControl, null);
     }
 }

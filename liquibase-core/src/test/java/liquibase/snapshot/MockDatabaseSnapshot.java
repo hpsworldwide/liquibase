@@ -15,7 +15,7 @@ public class MockDatabaseSnapshot extends DatabaseSnapshot {
     private final List<DatabaseObject> configuredObjects;
 
     public MockDatabaseSnapshot(List<DatabaseObject> configuredObjects, DatabaseObject[] examples, Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
-        super(null, database, snapshotControl);
+        super(null, database, snapshotControl, null);
         this.configuredObjects = configuredObjects;
         init(examples);
     }

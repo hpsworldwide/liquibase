@@ -182,7 +182,7 @@ public class DiffCommand extends AbstractCommand<CommandResult> {
         ObjectQuotingStrategy originalStrategy = targetDatabase.getObjectQuotingStrategy();
         try {
             targetDatabase.setObjectQuotingStrategy(ObjectQuotingStrategy.QUOTE_ALL_OBJECTS);
-            return SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, targetDatabase, snapshotControl);
+            return SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, targetDatabase, snapshotControl, this.objectChangeFilter);
         } finally {
             targetDatabase.setObjectQuotingStrategy(originalStrategy);
         }
@@ -219,7 +219,7 @@ public class DiffCommand extends AbstractCommand<CommandResult> {
         ObjectQuotingStrategy originalStrategy = referenceDatabase.getObjectQuotingStrategy();
         try {
             referenceDatabase.setObjectQuotingStrategy(ObjectQuotingStrategy.QUOTE_ALL_OBJECTS);
-            return SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, referenceDatabase, snapshotControl);
+            return SnapshotGeneratorFactory.getInstance().createSnapshot(schemas, referenceDatabase, snapshotControl, this.objectChangeFilter);
         } finally {
             referenceDatabase.setObjectQuotingStrategy(originalStrategy);
         }

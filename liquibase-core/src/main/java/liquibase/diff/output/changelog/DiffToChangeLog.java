@@ -356,7 +356,7 @@ public class DiffToChangeLog {
                 schemas.add(database.getDefaultSchemaName());
             }
 
-            try {
+            /*try {
                 final List<String> dependencyOrder = new ArrayList<>();
                 DependencyUtil.NodeValueListener<String> nameListener = new DependencyUtil.NodeValueListener<String>() {
                     @Override
@@ -421,7 +421,7 @@ public class DiffToChangeLog {
                 }
             } catch (DatabaseException e) {
                 Scope.getCurrentScope().getLog(getClass()).fine("Cannot get object dependencies: " + e.getMessage());
-            }
+            }*/
         }
 
         return new ArrayList<>(objects);
@@ -438,7 +438,7 @@ public class DiffToChangeLog {
                                 return "OWNER='" + obj + "'";
                             }
                         }
-                ) + ")"));
+                ) + ") AND NAME IN ('ACCOUNT_TYPE_LIST','CHANNEL_TYPE_LIST','COMMS_LIST','CURRENCY_TABLE','LANGUAGE_LIST','MCC','MCC_RANGE','MESSAGE_LIST','NETWORK','PCARD_ID_ENTITY_SEQUENCE','POWERCARD_GLOBALS','PROCESSING_LIST','PROTOCOL_LIST','RESOURCE_LIST','RESOURCES','SENDING_MODE_LIST','STATUS_LIST','TCC','TLV_REPOSITORY','TRANSACTIONS_DEFINITION')"));
             } else {
                 rs = executor.queryForList(new RawSqlStatement("select NAME, REFERENCED_OWNER, REFERENCED_NAME from USER_DEPENDENCIES where REFERENCED_OWNER != 'SYS' AND NOT(NAME LIKE 'BIN$%') AND NOT(NAME = REFERENCED_NAME) AND (" + StringUtil.join(schemas, " OR ", new StringUtil.StringUtilFormatter<String>() {
                             @Override
@@ -446,7 +446,7 @@ public class DiffToChangeLog {
                                 return "REFERENCED_OWNER='" + obj + "'";
                             }
                         }
-                ) + ")"));
+                ) + ") AND NAME IN ('ACCOUNT_TYPE_LIST','CHANNEL_TYPE_LIST','COMMS_LIST','CURRENCY_TABLE','LANGUAGE_LIST','MCC','MCC_RANGE','MESSAGE_LIST','NETWORK','PCARD_ID_ENTITY_SEQUENCE','POWERCARD_GLOBALS','PROCESSING_LIST','PROTOCOL_LIST','RESOURCE_LIST','RESOURCES','SENDING_MODE_LIST','STATUS_LIST','TCC','TLV_REPOSITORY','TRANSACTIONS_DEFINITION'))"));
             }
         } catch (DatabaseException dbe) {
             //

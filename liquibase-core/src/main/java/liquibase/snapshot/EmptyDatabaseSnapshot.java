@@ -10,6 +10,6 @@ public class EmptyDatabaseSnapshot extends DatabaseSnapshot {
     }
 
     public EmptyDatabaseSnapshot(Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
-        super(new DatabaseObject[0], database, snapshotControl);
+        super(new DatabaseObject[0], database, snapshotControl, null);
     }
 }

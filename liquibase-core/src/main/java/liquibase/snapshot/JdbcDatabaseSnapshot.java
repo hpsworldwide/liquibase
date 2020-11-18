@@ -14,6 +14,8 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.core.*;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.diff.output.ObjectChangeFilter;
+import liquibase.diff.output.StandardObjectChangeFilter;
 import liquibase.exception.DatabaseException;
 import liquibase.executor.jvm.ColumnMapRowMapper;
 import liquibase.executor.jvm.RowMapperNotNullConstraintsResultSetExtractor;
@@ -34,8 +36,8 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
 
     private Set<String> userDefinedTypes;
 
-    public JdbcDatabaseSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl) throws DatabaseException, InvalidExampleException {
-        super(examples, database, snapshotControl);
+    public JdbcDatabaseSnapshot(DatabaseObject[] examples, Database database, SnapshotControl snapshotControl, ObjectChangeFilter objectChangeFilter) throws DatabaseException, InvalidExampleException {
+        super(examples, database, snapshotControl, objectChangeFilter);
     }
 
     public JdbcDatabaseSnapshot(DatabaseObject[] examples, Database database) throws DatabaseException, InvalidExampleException {
@@ -49,7 +51,7 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
                 databaseMetaData = ((JdbcConnection) getDatabase().getConnection()).getUnderlyingConnection().getMetaData();
             }
 
-            cachingDatabaseMetaData = new CachingDatabaseMetaData(this.getDatabase(), databaseMetaData);
+            cachingDatabaseMetaData = new CachingDatabaseMetaData(this.getDatabase(), databaseMetaData, this.getObjectChangeFilter());
         }
         return cachingDatabaseMetaData;
     }
@@ -59,10 +61,12 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
         private static final String SQL_FILTER_MATCH_ALL = "%";
         private DatabaseMetaData databaseMetaData;
         private Database database;
+        private final ObjectChangeFilter objectChangeFilter;
 
-        public CachingDatabaseMetaData(Database database, DatabaseMetaData metaData) {
+        public CachingDatabaseMetaData(Database database, DatabaseMetaData metaData, ObjectChangeFilter objectChangeFilter) {
             this.databaseMetaData = metaData;
             this.database = database;
+            this.objectChangeFilter = objectChangeFilter;
         }
 
         public java.sql.DatabaseMetaData getDatabaseMetaData() {
@@ -437,6 +441,15 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
               sql += "WHERE OWNER='" + jdbcSchemaName + "' AND hidden_column='NO'";
             } else {
               sql += "WHERE OWNER IN ('" + jdbcSchemaName + "', " + getAllCatalogsStringScratchData() + ") AND hidden_column='NO'";
+            }
+
+            if(objectChangeFilter != null){
+                StringJoiner filterItem = new StringJoiner(",");
+                StandardObjectChangeFilter standardObjectChangeFilter = ((StandardObjectChangeFilter) objectChangeFilter);
+                for(StandardObjectChangeFilter.Filter filter : standardObjectChangeFilter.getFilters()) {
+                    filterItem.add("'" + filter.getNameMatcher() + "'");
+                }
+                sql += " AND TABLE_NAME IN (" + filterItem.toString() + ")";
             }
 
             if (!bulk) {
@@ -896,6 +909,9 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
                         + " AND atc.hidden_column='NO' AND ac.CONSTRAINT_TYPE='C'  and ac.search_condition is not null ";
                 }
 
+                sqlToSelectNotNullConstraints += " AND 1=0 ";
+
+
                 sqlToSelectNotNullConstraints += (!bulk && tableName != null && !tableName.isEmpty()) ? " AND atc.TABLE_NAME='" + jdbcTableName + "'":"";
 
                 return this.executeAndExtract(sqlToSelectNotNullConstraints, database);
@@ -1150,7 +1166,7 @@ public class JdbcDatabaseSnapshot extends DatabaseSnapshot {
                       sql +=  ", EDITIONING_VIEW";
                     }
                     sql += " from ALL_VIEWS a " +
-                            "join ALL_TAB_COMMENTS c on a.VIEW_NAME=c.table_name and a.owner=c.owner ";
+                            "join ALL_TAB_COMMENTS c on a.VIEW_NAME=c.table_name and a.owner=c.owner and 1=0 ";
                     if (viewName != null || getAllCatalogsStringScratchData() == null) {
                         sql += "WHERE a.OWNER='" + ownerName + "'";
                     } else {

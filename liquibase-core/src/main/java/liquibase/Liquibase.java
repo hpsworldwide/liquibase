@@ -2237,7 +2237,7 @@ public class Liquibase implements AutoCloseable {
                         originalDatabaseSnapshot = SnapshotGeneratorFactory.getInstance().createSnapshot(
                                 compareControl.getSchemas(CompareControl.DatabaseRole.REFERENCE),
                                 getDatabase(),
-                                snapshotControl
+                                snapshotControl, null
                         );
 
                         DiffResult diffResult = DiffGeneratorFactory.getInstance().compare(
@@ -2245,7 +2245,7 @@ public class Liquibase implements AutoCloseable {
                                 SnapshotGeneratorFactory.getInstance().createSnapshot(
                                         compareControl.getSchemas(CompareControl.DatabaseRole.REFERENCE),
                                         null,
-                                        snapshotControl
+                                        snapshotControl, null
                                 ),
                                 compareControl
                         );

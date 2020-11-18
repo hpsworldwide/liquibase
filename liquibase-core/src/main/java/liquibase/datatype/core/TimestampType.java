@@ -32,33 +32,6 @@ public class TimestampType extends DateTimeType {
     public DatabaseDataType toDatabaseDataType(Database database) {
         String originalDefinition = StringUtil.trimToEmpty(getRawDefinition());
         // If a fractional precision is given, check is the DBMS supports the length
-        if (getParameters().length > 0) {
-            Integer desiredLength = null;
-            try {
-                desiredLength = Integer.parseInt(String.valueOf(getParameters()[0]));
-            } catch (NumberFormatException e) {
-                // That is ok, we won't touch the parameter in this case.
-            }
-
-            if (desiredLength != null) {
-                int maxFractionalDigits = database.getMaxFractionalDigitsForTimestamp();
-                if (maxFractionalDigits < desiredLength) {
-                    throw new DatabaseIncapableOfOperation(
-                            String.format(
-                                    "Using a TIMESTAMP data type with a fractional precision of %d", desiredLength
-                            ),
-                            String.format(
-                                    "A timestamp datatype with %d fractional digits was requested, but %s " +
-                                            "only supports %d digits.",
-                                    desiredLength,
-                                    database.getDatabaseProductName(),
-                                    maxFractionalDigits
-                            ),
-                            database
-                    );
-                }
-            }
-        }
 
         if (database instanceof MySQLDatabase) {
             if (originalDefinition.contains(" ") || originalDefinition.contains("(")) {
