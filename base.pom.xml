@@ -51,8 +51,8 @@
 
     <properties>
         <liquibase.base.version>4.1.2</liquibase.base.version>
-        <liquibase.version.qualifier>-local</liquibase.version.qualifier>
-        <liquibase.version.snapshot>-HPS</liquibase.version.snapshot>
+        <liquibase.version.qualifier>-HPS</liquibase.version.qualifier>
+        <liquibase.version.snapshot>-SNAPSHOT</liquibase.version.snapshot>
         <liquibase.version>${liquibase.base.version}${liquibase.version.qualifier}${liquibase.version.snapshot}</liquibase.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -277,30 +277,6 @@
                 </configuration>
             </plugin>
 
-            <!-- By default, no sub-module will be deployed to maven. Override this setting in sub-modules that should be -->
-            <plugin>
-                <artifactId>maven-install-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-install</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
 
             <!-- We don't use the site plugin for anything except where we use the generated
                  documentation for the liquibase-maven-plugin. This custom template is much
