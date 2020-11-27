@@ -959,12 +959,12 @@ public class Main {
                     }
                 }
             }
-        } else if (COMMANDS.DIFF_CHANGELOG.equalsIgnoreCase(command) && (diffTypes != null) && diffTypes.toLowerCase
+        } /*else if (COMMANDS.DIFF_CHANGELOG.equalsIgnoreCase(command) && (diffTypes != null) && diffTypes.toLowerCase
                 ().contains("data")) {
             messages.add(String.format(coreBundle.getString("including.data.diffchangelog.has.no.effect"),
                     OPTIONS.DIFF_TYPES, COMMANDS.GENERATE_CHANGELOG
             ));
-        }
+        }*/
     }
 
     /**
